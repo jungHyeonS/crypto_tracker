@@ -1,9 +1,12 @@
 
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components"
 
 const Continer = styled.div`
     padding: 0 20px;
+    max-width: 480px;
+    margin: 0 auto;
 `;
 
 const Header = styled.header`
@@ -11,6 +14,7 @@ const Header = styled.header`
     display: flex;
     justify-content: center;
     align-items: center;
+    
 `;
 
 const ConinsList = styled.ul``;
@@ -37,35 +41,43 @@ const Title = styled.h1`
     color:${props => props.theme.accentColor};
 `
 
-const coins = [
-    {
-        name:"btn",
-        symbol:"btn",
-        id:1
-    },
-    {
-        name:"hex",
-        symbol:"hex",
-        id:2
-    },
-    {
-        name:"unak",
-        symbol:"unak",
-        id:3
-    }
-]
+const Loader = styled.span`
+    text-align: center;
+`
+
+
+interface CoinInterface {
+    id:string,
+    name:string,
+    symbol:string,
+    rank:number,
+    is_new:boolean,
+    is_active:boolean,
+    type:string
+}
 
 function Coins(){
+    const [coins,setCoins] = useState<CoinInterface[]>([])
+    const [loading,setLoading] = useState(true);
+    useEffect(()=>{
+        (async() => {
+            const resposne = await fetch("https://api.coinpaprika.com/v1/coins")
+            const json = await resposne.json();
+            setCoins(json.slice(0,100))
+            setLoading(false)
+        })()
+        
+    },[])
     return (
         <Continer>
             <Header>
                 <Title>코인</Title>
             </Header>
-            <ConinsList>
+            {loading ? (<Loader>Loading..</Loader>) : (<ConinsList>
                 {coins.map(coin => <Coin key={coin.id}>
                     <Link to={`/${coin.id}`}>{coin.name} &rarr;</Link>
                 </Coin>)}
-            </ConinsList>
+            </ConinsList>)}
         </Continer>
     )
 }
