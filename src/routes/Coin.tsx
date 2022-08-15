@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom"
 import styled from "styled-components"
 const Continer = styled.div`
@@ -32,19 +32,31 @@ interface LocationState{
     state : {
         name : string
     }
-    
 }
 
 function Coin(){
     const {coinId} = useParams() as unknown as Params
     const [loading,setLoading] = useState(true)
 
-    const {state:{name}} = useLocation() as unknown as LocationState;
+    const {state} = useLocation() as unknown as LocationState;
+
+    const [info,setInfo] = useState({})
+    const [price,setPrice] = useState({});
+
+    useEffect(()=>{
+        (async() => {
+            const infoData = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json()
+            const priceData = await(await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json()
+            setInfo(infoData);
+            setPrice(priceData)
+        })()
+    },[])
+
     console.log(coinId)
     return (
         <Continer>
             <Header>
-                <Title>{name}</Title>
+                <Title>{state?.name || "Loading..."}</Title>
             </Header>
             {loading ? (<Loader>Loading..</Loader>) : null}
         </Continer>
