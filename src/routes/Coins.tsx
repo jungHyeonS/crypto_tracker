@@ -1,7 +1,9 @@
 
 import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 import styled from "styled-components"
+import { fetchCoin } from "../api/api";
 
 const Continer = styled.div`
     padding: 0 20px;
@@ -53,7 +55,7 @@ const Image = styled.img`
 `;
 
 
-interface CoinInterface {
+interface ICoin {
     id:string,
     name:string,
     symbol:string,
@@ -64,24 +66,28 @@ interface CoinInterface {
 }
 
 function Coins(){
-    const [coins,setCoins] = useState<CoinInterface[]>([])
-    const [loading,setLoading] = useState(true);
-    useEffect(()=>{
-        (async() => {
-            const resposne = await fetch("https://api.coinpaprika.com/v1/coins")
-            const json = await resposne.json();
-            setCoins(json.slice(0,100))
-            setLoading(false)
-        })()
-        
-    },[])
+    // const [coins,setCoins] = useState<ICoin[]>([])
+    // const [loading,setLoading] = useState(true);
+    // useEffect(()=>{
+    //     (async() => {
+    //         const resposne = await fetch("https://api.coinpaprika.com/v1/coins")
+    //         const json = await resposne.json();
+    //         setCoins(json.slice(0,100))
+    //         setLoading(false)
+    //     })()
+    // },[])
+
+
+    //reactquery 는 로딩 값과 api에 데이터값을 리턴해준다
+    const {isLoading,data} = useQuery<ICoin[]>(["allCoins"],fetchCoin)
+
     return (
         <Continer>
             <Header>
                 <Title>코인</Title>
             </Header>
-            {loading ? (<Loader>Loading..</Loader>) : (<ConinsList>
-                {coins.map(coin => <Coin key={coin.id}>
+            {isLoading ? (<Loader>Loading..</Loader>) : (<ConinsList>
+                {data?.slice(0,100).map(coin => <Coin key={coin.id}>
                     <Link to={`/${coin.id}`} state={{name:coin.name}}>
                         <Image src={`https://coinicons-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`}/>
                         {coin.name} &rarr;

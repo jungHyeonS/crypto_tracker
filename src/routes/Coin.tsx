@@ -1,7 +1,9 @@
+import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
 import { Link, useMatch } from "react-router-dom";
 import { Route, Routes, useLocation, useParams } from "react-router-dom"
 import styled from "styled-components"
+import { fetchCoinInfo, fetchCoinTickers } from "../api/api";
 import Chart from "./Chart";
 import Price from "./Price";
 const Continer = styled.div`
@@ -140,58 +142,62 @@ interface IPriceData{
 
 function Coin(){
     const {coinId} = useParams() as unknown as Params
-    const [loading,setLoading] = useState(true)
-
     const {state} = useLocation() as unknown as LocationState;
 
-    const [info,setInfo] = useState<IInfoData>()
-    const [price,setPrice] = useState<IPriceData>();
+
+    // const [loading,setLoading] = useState(true)
+    // const [info,setInfo] = useState<IInfoData>()
+    // const [price,setPrice] = useState<IPriceData>();
 
     const priceMatch = useMatch("/:coinId/price");
     const chartMatch = useMatch("/:coinId/chart");
 
-    useEffect(()=>{
-        (async() => {
-            const infoData = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json()
-            console.log(infoData)
-            const priceData = await(await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json()
-            console.log(priceData)
-            setInfo(infoData);
-            setPrice(priceData)
-            setLoading(false)
-        })()
-    },[coinId])
+    // useEffect(()=>{
+    //     (async() => {
+    //         const infoData = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json()
+    //         console.log(infoData)
+    //         const priceData = await(await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json()
+    //         console.log(priceData)
+    //         setInfo(infoData);
+    //         setPrice(priceData)
+    //         setLoading(false)
+    //     })()
+    // },[coinId])
 
+
+    const {isLoading:infoLoading,data:infoData} = useQuery<IInfoData>(["info",coinId],() => fetchCoinInfo(coinId))
+    const {isLoading:tickersLoading,data:tickersData} = useQuery<IPriceData>(["tickers",coinId],() => fetchCoinTickers(coinId))
+    const loading = infoLoading || tickersLoading
     return (
         <Continer>
             <Header>
-                <Title>{state?.name ? state.name : loading ? "Loading" : info?.name}</Title>
+                <Title>{state?.name ? state.name : loading ? "Loading" : infoData?.name}</Title>
             </Header>
             {loading ? (<Loader>Loading..</Loader>) : (
                 <>
                     <OverView>
                         <OverViewItem>
                             <span>RANK:</span>
-                            <span>{info?.rank}</span>
+                            <span>{infoData?.rank}</span>
                         </OverViewItem>
                         <OverViewItem>
                             <span>Symbol:</span>
-                            <span>{info?.symbol}</span>
+                            <span>{infoData?.symbol}</span>
                         </OverViewItem>
                         <OverViewItem>
                             <span>Open Source:</span>
-                            <span>{info?.open_source ? "Yes":"No"}</span>
+                            <span>{infoData?.open_source ? "Yes":"No"}</span>
                         </OverViewItem>
                     </OverView>
-                    <Description>{info?.description}</Description>
+                    <Description>{infoData?.description}</Description>
                     <OverView>
                         <OverViewItem>
                                 <span>Total Supply:</span>
-                                <span>{price?.total_supply}</span>
+                                <span>{tickersData?.total_supply}</span>
                         </OverViewItem>
                         <OverViewItem>
                                 <span>Max Supply:</span>
-                                <span>{price?.max_supply}</span>
+                                <span>{tickersData?.max_supply}</span>
                         </OverViewItem>
                     </OverView>
 
