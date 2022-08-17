@@ -2,21 +2,12 @@ import { useQuery } from "react-query";
 import { useParams } from "react-router-dom"
 import { fetchCoinHistory } from "../api/api";
 import ApexChart from "react-apexcharts"
+import { ChartProps } from "../interface/ChartProps";
+import { ICoinItem } from "../interface/CoinItem";
 
-interface ChartProps{
-    coinId:string;
-}
 
-interface ICoinItem{
-    time_open: number,
-    time_close: number,
-    open: string,
-    high: string,
-    low: string,
-    close:string,
-    volume: string,
-    market_cap: number,
-}
+
+
 
 function Chart({coinId}:ChartProps){
     const {isLoading,data} = useQuery<ICoinItem[]>(["ohlcv",coinId],()=>fetchCoinHistory(coinId),{
