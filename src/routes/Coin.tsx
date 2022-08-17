@@ -1,13 +1,14 @@
 import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
-import { Link, useMatch } from "react-router-dom";
-import { Route, Routes, useLocation, useParams } from "react-router-dom"
+import { Route, Routes, useLocation, useParams ,Link, useMatch,useNavigate} from "react-router-dom"
 import styled from "styled-components"
 import { fetchCoinInfo, fetchCoinTickers } from "../api/api";
 import Chart from "./Chart";
 import Price from "./Price";
 
 import {Helmet} from "react-helmet"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faArrowLeft} from "@fortawesome/free-solid-svg-icons"
 
 const Continer = styled.div`
     padding: 0 20px;
@@ -17,15 +18,31 @@ const Continer = styled.div`
 
 const Header = styled.header`
     height: 10vh;
-    display: flex;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
-    
+    align-items: center; */
+    display  : flex;
+    justify-content: space-between;
+    padding-top: 20px;
 `;
 
-const Title = styled.h1`
-    font-size: 48px;
-    color:${props => props.theme.accentColor};
+const Title = styled.div`
+    display  : flex;
+    justify-content: space-between;
+    
+`
+const TitleItem = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    &:first-child{
+        padding-top: 10px;
+        cursor: pointer;
+    }
+    p{
+        font-size: 48px;
+        color:${props => props.theme.accentColor};
+    }
 `
 
 const Loader = styled.span`
@@ -147,7 +164,6 @@ function Coin(){
     const {coinId} = useParams() as unknown as Params
     const {state} = useLocation() as unknown as LocationState;
 
-
     // const [loading,setLoading] = useState(true)
     // const [info,setInfo] = useState<IInfoData>()
     // const [price,setPrice] = useState<IPriceData>();
@@ -175,13 +191,24 @@ function Coin(){
     })
 
     const loading = infoLoading || tickersLoading
+
+    const nav = useNavigate();
+    const pageBack = () => {
+        nav("/", { replace: true });
+    }
     return (
         <Continer>
             <Helmet>
                 <title>{state?.name ? state.name : loading ? "Loading" : infoData?.name}</title>
             </Helmet>
             <Header>
-                <Title>{state?.name ? state.name : loading ? "Loading" : infoData?.name}</Title>
+                <TitleItem onClick={pageBack}>
+                {/* <FontAwesomeIcon icon="check-square" /> */}
+                <FontAwesomeIcon icon={faArrowLeft}/>
+                </TitleItem>
+                <TitleItem><p>{state?.name ? state.name : loading ? "Loading" : infoData?.name}</p></TitleItem>
+                <TitleItem>
+                </TitleItem>
             </Header>
             {loading ? (<Loader>Loading..</Loader>) : (
                 <>
