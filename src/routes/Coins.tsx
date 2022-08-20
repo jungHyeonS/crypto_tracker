@@ -23,10 +23,11 @@ const Header = styled.header`
 const ConinsList = styled.ul``;
 
 const Coin = styled.li`
-    background-color: white;
-    color:${props=>props.theme.bgColor};
+    background-color: ${props => props.theme.cardBgColor};
+    color:${props=>props.theme.textColor};
     margin-bottom: 10px;
     border-radius:15px;
+    border: 1px solid white;
     a{
         align-items: center;
         display: flex;
@@ -66,7 +67,11 @@ interface ICoin {
     type:string
 }
 
-function Coins(){
+interface ICoinsProps {
+    toggleDark : () => void;
+}
+
+function Coins({toggleDark} : ICoinsProps){
     // const [coins,setCoins] = useState<ICoin[]>([])
     // const [loading,setLoading] = useState(true);
     // useEffect(()=>{
@@ -89,6 +94,7 @@ function Coins(){
             </Helmet>
             <Header>
                 <Title>코인</Title>
+                <button onClick={toggleDark}>Toogle Dark Mode</button>
             </Header>
             {isLoading ? (<Loader>Loading..</Loader>) : (<ConinsList>
                 {data?.slice(0,100).map(coin => <Coin key={coin.id}>

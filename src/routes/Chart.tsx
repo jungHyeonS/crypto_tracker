@@ -9,7 +9,7 @@ import { ICoinItem } from "../interface/CoinItem";
 
 
 
-function Chart({coinId}:ChartProps){
+function Chart({coinId,isDark}:ChartProps){
     const {isLoading,data} = useQuery<ICoinItem[]>(["ohlcv",coinId],()=>fetchCoinHistory(coinId),{
         refetchInterval:5000
     })
@@ -27,7 +27,7 @@ function Chart({coinId}:ChartProps){
             ]}
             options={{
                 theme:{
-                    mode:"dark"
+                    mode:isDark?"dark":"light"
                 },
                 chart:{
                     height: 500,
