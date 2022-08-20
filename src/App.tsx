@@ -3,6 +3,8 @@ import { createGlobalStyle, ThemeProvider } from "styled-components";
 import Router from './Router';
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { darkTheme,lightTheme } from './theme';
+import { useRecoilValue } from 'recoil';
+import { isDarkAtom } from './atoms';
 //전역 스타일
 const GlobalStyles = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap');
@@ -56,6 +58,7 @@ table {
 body{
   font-family: 'Source Sans Pro', sans-serif;
   background-color: ${props => props.theme.bgColor};
+  transition: background-color 0.3s;
   color:${props=>props.theme.textColor}
 }
 a{
@@ -66,14 +69,13 @@ a{
 
 
 function App() {
-	const [isDark,setIsDark] = useState(false);
-	const toggleDark = () => setIsDark(current => !current)
+	const isDark = useRecoilValue(isDarkAtom)
   return (
     <>
 		<ThemeProvider theme={isDark ? darkTheme : lightTheme}>
 			
 			<GlobalStyles/>
-			<Router isDark={isDark} toggleDark={toggleDark}/>
+			<Router />
 			{/* <ReactQueryDevtools initialIsOpen={false}/> */}
 		</ThemeProvider>
     </>

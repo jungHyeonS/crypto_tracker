@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components"
 import { fetchCoin } from "../api/api";
+import { isDarkAtom } from "../atoms";
 
 const Continer = styled.div`
     padding: 0 20px;
@@ -68,10 +70,9 @@ interface ICoin {
 }
 
 interface ICoinsProps {
-    toggleDark : () => void;
 }
 
-function Coins({toggleDark} : ICoinsProps){
+function Coins({} : ICoinsProps){
     // const [coins,setCoins] = useState<ICoin[]>([])
     // const [loading,setLoading] = useState(true);
     // useEffect(()=>{
@@ -87,6 +88,7 @@ function Coins({toggleDark} : ICoinsProps){
     //reactquery 는 로딩 값과 api에 데이터값을 리턴해준다
     const {isLoading,data} = useQuery<ICoin[]>(["allCoins"],fetchCoin)
 
+    const setDarkAtom = useSetRecoilState(isDarkAtom);
     return (
         <Continer>
             <Helmet>
@@ -94,7 +96,7 @@ function Coins({toggleDark} : ICoinsProps){
             </Helmet>
             <Header>
                 <Title>코인</Title>
-                <button onClick={toggleDark}>Toogle Dark Mode</button>
+                <button onClick={() => setDarkAtom((prev) => !prev)}>Toggle Mode</button>
             </Header>
             {isLoading ? (<Loader>Loading..</Loader>) : (<ConinsList>
                 {data?.slice(0,100).map(coin => <Coin key={coin.id}>
